@@ -487,11 +487,13 @@
 <body>
 
 <!-- ================= INTRO VIDEO ================= -->
-<div id="intro">
-  <video id="introVideo" src="intro.mp4" playsinline></video>
-  <button id="introPlayBtn"><span class="play-icon"></span> Play</button>
-  
-</div>
+<video id="introVideo" playsinline preload="auto">
+  <source src="./intro.mp4" type="video/mp4">
+</video>
+<video id="introVideo" src="intro.mp4" playsinline preload="auto"></video>
+<button id="introPlayBtn">
+  <span class="play-icon"></span> Play
+</button>
 
 <!-- ================= LOCK SCREEN ================= -->
 <div id="lock" class="paper">
@@ -731,10 +733,16 @@ Happy Birthday Maryem I hope today is as beautiful as your heart and I wish you 
     intro.classList.add("hide");
     setTimeout(()=>{ intro.style.display = "none"; }, 800);
   }
-  introPlayBtn.addEventListener("click", ()=>{
-    introVideo.play();
-    introPlayBtn.classList.add("hidden");
-  });
+  introPlayBtn.addEventListener("click", async () => {
+    try {
+        introVideo.load();
+        await introVideo.play();
+        introPlayBtn.classList.add("hidden");
+    } catch (error) {
+        console.log("Video playback error:", error);
+    }
+});
+  
   introVideo.addEventListener("ended", closeIntro);
   introSkip.addEventListener("click", closeIntro);
   introVideo.addEventListener("error", closeIntro);
