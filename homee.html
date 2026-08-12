@@ -32,21 +32,23 @@
 
   /* --- intro video --- */
   #intro{
-  position:fixed;
-  inset:0;
-  z-index:9999;
-  background:#000;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  overflow:hidden;
+    position:fixed;
+    inset:0;
+    z-index:9999;
+    background:#000;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
 }
 
 #intro video{
-  width:100%;
-  height:100%;
-  object-fit:contain;
-  display:block;
+  
+    width:100%;
+    height:100%;
+    object-fit:contain;
+    display:block;
+
 }
   #introSkip{
     position:absolute; bottom:30px; right:24px;
@@ -733,13 +735,13 @@ Happy Birthday Maryem I hope today is as beautiful as your heart and I wish you 
   // ---------- CONFIG ----------
   const CODE = "2308"; // <-- change le code secret ici
 
-  // ---------- INTRO VIDEO ----------
+
 // ---------- INTRO VIDEO ----------
 const intro = document.getElementById("intro");
 const introVideo = document.getElementById("introVideo");
 const introPlayBtn = document.getElementById("introPlayBtn");
 
-function closeIntro() {
+function closeIntro(){
     introVideo.pause();
     intro.classList.add("hide");
 
@@ -752,8 +754,8 @@ introPlayBtn.addEventListener("click", async () => {
     try {
         await introVideo.play();
         introPlayBtn.classList.add("hidden");
-    } catch (error) {
-        console.log("Video playback error:", error);
+    } catch(error) {
+        console.log("Video error:", error);
     }
 });
 
