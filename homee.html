@@ -32,13 +32,22 @@
 
   /* --- intro video --- */
   #intro{
-    position:fixed; inset:0; z-index:1000;
-    background:#000;
-    display:flex; align-items:center; justify-content:center;
-  }
-  #intro video{
-    width:100%; height:100%; object-fit:cover;
-  }
+  position:fixed;
+  inset:0;
+  z-index:9999;
+  background:#000;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+}
+
+#intro video{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  display:block;
+}
   #introSkip{
     position:absolute; bottom:30px; right:24px;
     background: rgba(255,255,255,0.15);
@@ -487,13 +496,15 @@
 <body>
 
 <!-- ================= INTRO VIDEO ================= -->
-<video id="introVideo" playsinline preload="auto">
-  <source src="./intro.mp4" type="video/mp4">
-</video>
-<video id="introVideo" src="intro.mp4" playsinline preload="auto"></video>
-<button id="introPlayBtn">
-  <span class="play-icon"></span> Play
-</button>
+<div id="intro">
+  <video id="introVideo" playsinline preload="auto">
+      <source src="./intro.mp4" type="video/mp4">
+  </video>
+
+  <button id="introPlayBtn">
+      <span class="play-icon"></span> Play
+  </button>
+</div>
 
 <!-- ================= LOCK SCREEN ================= -->
 <div id="lock" class="paper">
@@ -723,29 +734,30 @@ Happy Birthday Maryem I hope today is as beautiful as your heart and I wish you 
   const CODE = "2308"; // <-- change le code secret ici
 
   // ---------- INTRO VIDEO ----------
-  const intro = document.getElementById("intro");
-  const introVideo = document.getElementById("introVideo");
-  const introSkip = document.getElementById("introSkip");
-  const introPlayBtn = document.getElementById("introPlayBtn");
+// ---------- INTRO VIDEO ----------
+const intro = document.getElementById("intro");
+const introVideo = document.getElementById("introVideo");
+const introPlayBtn = document.getElementById("introPlayBtn");
 
-  function closeIntro(){
+function closeIntro() {
     introVideo.pause();
     intro.classList.add("hide");
-    setTimeout(()=>{ intro.style.display = "none"; }, 800);
-  }
-  introPlayBtn.addEventListener("click", async () => {
+
+    setTimeout(() => {
+        intro.style.display = "none";
+    }, 800);
+}
+
+introPlayBtn.addEventListener("click", async () => {
     try {
-        introVideo.load();
         await introVideo.play();
         introPlayBtn.classList.add("hidden");
     } catch (error) {
         console.log("Video playback error:", error);
     }
 });
-  
-  introVideo.addEventListener("ended", closeIntro);
-  introSkip.addEventListener("click", closeIntro);
-  introVideo.addEventListener("error", closeIntro);
+
+introVideo.addEventListener("ended", closeIntro);
 
   // ---------- LOCK LOGIC ----------
   let entered = "";
