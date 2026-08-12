@@ -141,34 +141,33 @@ opacity:.7;
 </div>
 
 <script>
-
-const target = new Date("2026-08-12T20:34:00+01:00").getTime();
-
-const timer=setInterval(function(){
-
-const now=new Date().getTime();
-
-const distance=target-now;
-
-if(distance<=0){
-
-clearInterval(timer);
-
-window.location.href="homee.html";
-
-}
-
-document.getElementById("days").innerHTML=Math.floor(distance/(1000*60*60*24));
-
-document.getElementById("hours").innerHTML=Math.floor((distance%(1000*60*60*24))/(1000*60*60));
-
-document.getElementById("minutes").innerHTML=Math.floor((distance%(1000*60*60))/(1000*60));
-
-document.getElementById("seconds").innerHTML=Math.floor((distance%(1000*60))/1000);
-
-},1000);
-
-</script>
+    const target = new Date("2026-08-23T00:00:00+01:00").getTime();
+    
+    const timer = setInterval(function () {
+    
+        const now = new Date().getTime();
+        const distance = target - now;
+    
+        if (distance <= 0) {
+            clearInterval(timer);
+            window.location.href = "homee.html";
+            return;
+        }
+    
+        document.getElementById("days").textContent =
+            Math.floor(distance / (1000 * 60 * 60 * 24));
+    
+        document.getElementById("hours").textContent =
+            Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    
+        document.getElementById("minutes").textContent =
+            Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+    
+        document.getElementById("seconds").textContent =
+            Math.floor((distance % (1000 * 60)) / 1000);
+    
+    }, 1000);
+    </script>
 
 </body>
 </html>
