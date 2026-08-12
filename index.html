@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Coming Soon ❤️</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
+
+body{
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+background:linear-gradient(135deg,#0f172a,#1e293b,#020617);
+overflow:hidden;
+color:white;
+}
+
+body::before{
+content:"";
+position:absolute;
+width:100%;
+height:100%;
+background:
+radial-gradient(circle,#ffffff15 2px,transparent 2px);
+background-size:40px 40px;
+animation:move 15s linear infinite;
+}
+
+@keyframes move{
+from{transform:translateY(0);}
+to{transform:translateY(40px);}
+}
+
+.container{
+position:relative;
+z-index:2;
+text-align:center;
+padding:30px;
+}
+
+h1{
+font-size:60px;
+margin-bottom:10px;
+}
+
+p{
+font-size:20px;
+opacity:.8;
+margin-bottom:35px;
+}
+
+.timer{
+display:flex;
+gap:20px;
+justify-content:center;
+flex-wrap:wrap;
+}
+
+.box{
+width:130px;
+height:130px;
+background:rgba(255,255,255,.08);
+backdrop-filter:blur(12px);
+border-radius:20px;
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+box-shadow:0 0 30px rgba(255,255,255,.08);
+}
+
+.number{
+font-size:45px;
+font-weight:bold;
+}
+
+.label{
+margin-top:8px;
+opacity:.8;
+}
+
+.footer{
+margin-top:40px;
+font-size:18px;
+opacity:.7;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>❤️ Coming Soon ❤️</h1>
+
+<p>The surprise will open automatically on</p>
+
+<h2>23 August 2026 - 00:00</h2>
+
+<br><br>
+
+<div class="timer">
+
+<div class="box">
+<div id="days" class="number">0</div>
+<div class="label">Days</div>
+</div>
+
+<div class="box">
+<div id="hours" class="number">0</div>
+<div class="label">Hours</div>
+</div>
+
+<div class="box">
+<div id="minutes" class="number">0</div>
+<div class="label">Minutes</div>
+</div>
+
+<div class="box">
+<div id="seconds" class="number">0</div>
+<div class="label">Seconds</div>
+</div>
+
+</div>
+
+<div class="footer">
+
+</div>
+
+</div>
+
+<script>
+
+const target = new Date("2026-08-12T20:34:00+01:00").getTime();
+
+const timer=setInterval(function(){
+
+const now=new Date().getTime();
+
+const distance=target-now;
+
+if(distance<=0){
+
+clearInterval(timer);
+
+window.location.href="homee.html";
+
+}
+
+document.getElementById("days").innerHTML=Math.floor(distance/(1000*60*60*24));
+
+document.getElementById("hours").innerHTML=Math.floor((distance%(1000*60*60*24))/(1000*60*60));
+
+document.getElementById("minutes").innerHTML=Math.floor((distance%(1000*60*60))/(1000*60));
+
+document.getElementById("seconds").innerHTML=Math.floor((distance%(1000*60))/1000);
+
+},1000);
+
+</script>
+
+</body>
+</html>

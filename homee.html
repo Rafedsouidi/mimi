@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta name="google-site-verification" content="n6RaFAFUP1_DuvfnLAeTYiI6CR9Bbs6leoWypLoGSR8" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pour Toi</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Cinzel:wght@500;600&display=swap');
+
+  :root{
+    --parchment: #f3e9d2;
+    --parchment-dark: #e6d4ab;
+    --ink: #3a2e1f;
+    --gold: #b8892b;
+    --gold-light: #d9b56a;
+    --rose: #b8546b;
+    --rose-deep: #7a2e3a;
+    --moon: #fdf6e3;
+    --shadow: rgba(58,46,31,0.25);
+  }
+
+  *{ box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  body{
+    margin:0;
+    font-family:'Cormorant Garamond', serif;
+    background: var(--ink);
+    color: var(--ink);
+    overflow-x:hidden;
+  }
+
+  /* --- intro video --- */
+  #intro{
+    position:fixed; inset:0; z-index:1000;
+    background:#000;
+    display:flex; align-items:center; justify-content:center;
+  }
+  #intro video{
+    width:100%; height:100%; object-fit:cover;
+  }
+  #introSkip{
+    position:absolute; bottom:30px; right:24px;
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.4);
+    color:#fff; padding: 8px 18px; border-radius: 30px;
+    font-family:'Cinzel', serif; font-size:0.85rem;
+    cursor:pointer; backdrop-filter: blur(4px);
+  }
+  #introPlayBtn{
+    position:absolute; top:50%; left:50%; transform: translate(-50%,-50%);
+    display:flex; align-items:center; gap:12px;
+    background: rgba(0,0,0,0.45);
+    border: 2px solid rgba(255,255,255,0.6);
+    color:#fff; padding: 18px 34px; border-radius: 50px;
+    font-family:'Cinzel', serif; font-size:1.05rem; letter-spacing:0.04em;
+    cursor:pointer; backdrop-filter: blur(6px);
+    transition: transform .2s, background .2s;
+  }
+  #introPlayBtn:hover{ background: rgba(0,0,0,0.6); transform: translate(-50%,-50%) scale(1.05); }
+  #introPlayBtn .play-icon{
+    width:0; height:0;
+    border-style: solid;
+    border-width: 9px 0 9px 15px;
+    border-color: transparent transparent transparent #fff;
+  }
+  #introPlayBtn.hidden{ display:none; }
+  #intro.hide{
+    animation: introFade .8s ease forwards;
+    pointer-events:none;
+  }
+  @keyframes introFade{ to{ opacity:0; } }
+
+  /* ---------- shared texture ---------- */
+  .paper{
+    background:
+      radial-gradient(circle at 20% 20%, rgba(255,255,255,0.25), transparent 40%),
+      linear-gradient(180deg, var(--parchment) 0%, var(--parchment-dark) 100%);
+    position:relative;
+  }
+  .paper::before{
+    content:"";
+    position:absolute; inset:0;
+    background-image:
+      repeating-radial-gradient(circle at 50% 50%, rgba(184,137,43,0.03) 0, rgba(184,137,43,0.03) 1px, transparent 1px, transparent 4px);
+    pointer-events:none;
+    opacity:0.6;
+  }
+
+  h1,h2,h3{ font-family:'Cinzel', serif; letter-spacing:0.04em; margin:0; }
+
+  /* ================= LOCK SCREEN ================= */
+  #lock{
+    min-height:100vh;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    padding: 40px 20px;
+    text-align:center;
+    position:relative;
+    background-size:cover; background-position:center;
+  }
+  #lock::before{
+    content:"";
+    position:absolute; inset:0; z-index:0;
+  }
+  #lock > *{ position:relative; z-index:1; }
+  .moon-wrap{
+    width:120px; height:120px; margin-bottom:18px;
+    position:relative;
+  }
+  .moon{
+    width:100%; height:100%; border-radius:50%;
+    background: radial-gradient(circle at 35% 30%, #fffdf6, var(--moon) 60%, #e8dcb8 100%);
+    box-shadow: 0 0 40px 6px rgba(253,246,227,0.5), inset -12px -8px 20px rgba(184,137,43,0.15);
+    position:relative;
+    animation: floatY 6s ease-in-out infinite;
+  }
+  @keyframes floatY{ 0%,100%{ transform:translateY(0);} 50%{ transform:translateY(-10px);} }
+
+  .lock-heart{
+    width:74px; margin: -10px auto 6px;
+    filter: drop-shadow(0 6px 10px var(--shadow));
+    transition: transform .5s cubic-bezier(.2,.9,.3,1.4);
+  }
+  #lock.unlocked .lock-heart{ transform: scale(1.15) rotate(-6deg); }
+
+  .from-to{
+    font-family:'Caveat', cursive;
+    font-size:1.5rem;
+    color: var(--gold-light);
+    margin-top: 4px;
+    line-height:1.3;
+  }
+  .from-to b{ color:var(--parchment); }
+
+  .dots{ display:flex; gap:10px; margin: 18px 0 22px; }
+  .dot{
+    width:12px; height:12px; border-radius:50%;
+    border: 2px solid var(--gold);
+    background:transparent;
+    transition: background .2s, transform .2s;
+  }
+  .dot.filled{ background: var(--rose-deep); border-color:var(--rose-deep); transform:scale(1.15); }
+  .dot.shake{ animation: shakeDot .4s; }
+  @keyframes shakeDot{ 0%,100%{transform:translateX(0);} 25%{transform:translateX(-4px);} 75%{transform:translateX(4px);} }
+
+  .keypad{
+    display:grid;
+    grid-template-columns: repeat(3, 62px);
+    gap: 14px;
+  }
+  .key{
+    width:62px; height:62px;
+    border-radius:50%;
+    border: 1.5px solid var(--gold);
+    background: rgba(255,253,246,0.5);
+    color: var(--ink);
+    font-family:'Cinzel', serif;
+    font-size:1.15rem;
+    cursor:pointer;
+    transition: all .15s ease;
+  }
+  .key:hover{ background: var(--gold-light); transform: translateY(-2px); }
+  .key:active{ transform: scale(0.94); }
+  .key.wide{ font-size:0.85rem; }
+
+  .lock-hint{
+    margin-top:16px; font-size:0.95rem; color: var(--parchment); opacity:0.8; font-style:italic;
+  }
+
+  /* ============ MAIN CONTENT ============ */
+  #content{
+    display:none;
+  }
+  #content.show{ display:block; animation: fadeUp .9s ease; }
+  @keyframes fadeUp{ from{opacity:0; transform:translateY(30px);} to{opacity:1; transform:translateY(0);} }
+
+  section{
+    min-height:100vh;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    padding: 60px 24px;
+    position:relative;
+    background-size: cover;
+    background-position: center;
+  }
+  section::before{
+    content:"";
+    position:absolute; inset:0;
+    z-index:0;
+  }
+  section > *{ position:relative; z-index:1; }
+
+  #lock{ background-image:url('A.jpg'); }
+  #lock::before{ background: rgba(20,14,8,0.55); }
+
+  #song::before{ background: linear-gradient(160deg, rgba(36,20,24,0.82), rgba(58,31,38,0.75) 60%, rgba(36,20,24,0.85)); }
+  #song{ background-image:url('B.jpg'); }
+
+  #letter::before{ background: rgba(243,233,210,0.82); }
+  #letter{ background-image:url('C.jpg'); }
+
+  #voice::before{ background: linear-gradient(160deg, rgba(43,32,24,0.85), rgba(28,20,15,0.9)); }
+  #voice{ background-image:url('E.jpg'); background-position: center 25%; }
+
+  #locations::before{ background: linear-gradient(160deg, rgba(36,24,32,0.82), rgba(28,16,21,0.85)); }
+  #locations{ background-image:url('G.jpg'); }
+
+  #gallery::before{ background: rgba(243,233,210,0.85); }
+  #gallery{ background-image:url('D.jpg'); }
+
+  #closing::before{ background: linear-gradient(180deg, rgba(243,233,210,0.4), rgba(246,232,200,0.5)); }
+  #closing{ background-image:url('J.jpg'); background-position: center 25%; }
+
+  /* --- song section --- */
+  #song{ color:var(--parchment); }
+  .disco{
+    width:90px; height:90px; border-radius:50%; margin-bottom:26px;
+    background:
+      radial-gradient(circle at 30% 30%, #fff, #d8d8d8 40%, #9a9a9a 70%);
+    background-size: 8px 8px, cover;
+    box-shadow: 0 0 30px rgba(255,255,255,0.25);
+    position:relative;
+    overflow:hidden;
+    animation: spin 8s linear infinite;
+  }
+  .disco img{
+    width:100%; height:100%; object-fit:cover;
+    border-radius:50%;
+  }
+  .disco::after{
+    content:""; position:absolute; inset:0; border-radius:50%;
+    background-image:
+      linear-gradient(0deg, transparent 48%, rgba(0,0,0,0.15) 49%, transparent 51%),
+      linear-gradient(60deg, transparent 48%, rgba(0,0,0,0.15) 49%, transparent 51%),
+      linear-gradient(120deg, transparent 48%, rgba(0,0,0,0.15) 49%, transparent 51%);
+  }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+
+  .track-card{
+    display:flex; align-items:center; gap:16px;
+    background: rgba(20,12,14,0.55);
+    border: 1px solid rgba(217,181,106,0.3);
+    padding: 16px 20px; border-radius:16px;
+    backdrop-filter: blur(6px);
+    max-width: 360px; width:100%;
+  }
+  .track-art{
+    width:52px; height:52px; border-radius:8px; flex-shrink:0;
+    background: linear-gradient(135deg, var(--rose), var(--rose-deep));
+    display:flex; align-items:center; justify-content:center;
+    font-size:1.4rem;
+    overflow:hidden;
+  }
+  .track-art img{ width:100%; height:100%; object-fit:cover; }
+  .track-info{ flex:1; text-align:left; }
+  .track-info .name{ font-family:'Cinzel', serif; font-size:1rem; letter-spacing:0.02em; }
+  .track-info .artist{ font-size:0.85rem; opacity:0.7; margin-top:2px;}
+  .play-btn{
+    width:40px; height:40px; border-radius:50%; border:none; cursor:pointer;
+    background: var(--gold-light); color:#2a1a0f; font-size:1rem;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .caption{ margin-top:22px; font-family:'Caveat', cursive; font-size:1.4rem; opacity:0.85; }
+
+  /* --- letter section --- */
+  /* letter background now set via bg3-letter.jpg override above */
+  .note-card{
+    max-width: 560px;
+    background: var(--moon);
+    border-radius: 4px;
+    padding: 44px 38px;
+    box-shadow: 0 18px 40px var(--shadow), 0 0 0 1px rgba(184,137,43,0.15);
+    position:relative;
+    transform: rotate(-1.2deg);
+  }
+  .note-card::before{
+    content:"";
+    position:absolute; top:-14px; left: 50%; transform: translateX(-50%) rotate(4deg);
+    width:46px; height:20px; background: rgba(184,137,43,0.35); border-radius:2px;
+  }
+  .note-text{ font-size:1.25rem; line-height:1.75; color:var(--ink); }
+  .note-sign{ font-family:'Caveat', cursive; font-size:1.7rem; color:var(--rose-deep); margin-top:18px; display:block; text-align:right; }
+
+  /* --- voice note --- */
+  #voice{ color:var(--parchment); }
+  .voice-card{
+    display:flex; align-items:center; gap:16px;
+    background: rgba(243,233,210,0.08);
+    border:1px solid rgba(217,181,106,0.25);
+    padding:18px 22px; border-radius:20px;
+    max-width:380px; width:100%;
+  }
+  .voice-btn{
+    width:46px; height:46px; border-radius:50%; border:none; cursor:pointer;
+    background: var(--rose-deep); color:var(--parchment); font-size:1.1rem;
+  }
+  .waveform{ flex:1; display:flex; align-items:center; gap:3px; height:28px; }
+  .waveform span{
+    width:3px; background: var(--gold-light); border-radius:2px;
+    animation: wave 1.2s ease-in-out infinite;
+  }
+  @keyframes wave{ 0%,100%{ height:6px; } 50%{ height:24px; } }
+  .voice-time{ font-size:0.8rem; opacity:0.7; min-width:30px; text-align:right;}
+
+  /* --- map pin card --- */
+  #locations{ background: linear-gradient(160deg, #241820, #1c1015); color:var(--parchment); padding: 90px 24px; }
+  .loc-intro{ text-align:center; margin-bottom: 44px; }
+  .loc-intro h2{ color: var(--gold-light); margin-bottom:10px; }
+  .loc-intro p{ font-family:'Caveat', cursive; font-size:1.2rem; opacity:0.75; margin:0; }
+
+  .map-card{
+    width: 320px; max-width:90vw;
+  }
+  .map-visual{
+    position:relative;
+    width:100%; height: 260px;
+    border-radius: 16px;
+    overflow:hidden;
+    box-shadow: 0 16px 30px rgba(0,0,0,0.4);
+    background:
+      repeating-linear-gradient(0deg, #e9e2ce 0px, #e9e2ce 38px, #ded4b8 39px, #ded4b8 40px),
+      repeating-linear-gradient(90deg, #e9e2ce 0px, #e9e2ce 46px, #ded4b8 47px, #ded4b8 48px),
+      #ece5d0;
+  }
+  .map-visual::before{
+    content:"";
+    position:absolute; inset:0;
+    background:
+      radial-gradient(circle at 25% 70%, rgba(180,204,160,0.55) 0%, transparent 22%),
+      radial-gradient(circle at 78% 25%, rgba(180,204,160,0.4) 0%, transparent 18%);
+  }
+  .map-road{
+    position:absolute; background: #f4efdd; box-shadow: 0 0 0 1px rgba(0,0,0,0.06);
+  }
+  .map-road.h{ height: 10px; width: 100%; top: 44%; }
+  .map-road.v{ width: 10px; height: 100%; left: 60%; }
+
+  .map-pin{
+    position:absolute; left:50%; top:46%;
+    transform: translate(-50%, -100%);
+    display:flex; flex-direction:column; align-items:center;
+    filter: drop-shadow(0 8px 10px rgba(0,0,0,0.35));
+  }
+  .map-pin .pin-photo{
+    width: 64px; height:64px; border-radius: 50% 50% 50% 0;
+    transform: rotate(45deg);
+    overflow:hidden;
+    border: 4px solid var(--rose-deep);
+    background: var(--rose-deep);
+  }
+  .map-pin .pin-photo img{
+    width:100%; height:100%; object-fit:cover;
+    transform: rotate(-45deg) scale(1.4);
+  }
+  .map-pulse{
+    position:absolute; left:50%; bottom:-6px; transform: translateX(-50%);
+    width: 16px; height:16px; border-radius:50%;
+    background: rgba(122,46,58,0.4);
+    animation: pulse 2s ease-out infinite;
+  }
+  @keyframes pulse{
+    0%{ transform: translateX(-50%) scale(0.6); opacity:0.8; }
+    100%{ transform: translateX(-50%) scale(2.6); opacity:0; }
+  }
+
+  .map-label{
+    position:absolute; left:50%; top:46%;
+    transform: translate(-50%, calc(-100% - 84px));
+    background: #fff; color:#2b2420;
+    padding: 6px 12px; border-radius: 8px;
+    font-family:'Cinzel', serif; font-size:0.8rem; white-space:nowrap;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+  }
+  .map-label::after{
+    content:""; position:absolute; left:50%; bottom:-5px; transform:translateX(-50%);
+    border-width:5px 5px 0; border-style:solid; border-color:#fff transparent transparent;
+  }
+
+  .map-story{ margin-top: 20px; text-align:center; }
+  .map-story .date{ font-family:'Caveat', cursive; color:var(--gold-light); font-size:1.15rem; }
+  .map-story p{ font-size:1.1rem; line-height:1.6; color:var(--parchment); margin-top:6px; }
+
+  /* --- gallery --- */
+  #gallery{ min-height:auto; padding: 90px 24px; }
+  .gallery-intro{ margin-bottom: 40px; text-align:center; }
+  .gallery-intro h2{ color:var(--rose-deep); margin-bottom:10px; }
+  .gallery-intro p{ font-family:'Caveat', cursive; font-size:1.2rem; opacity:0.75; margin:0; }
+
+  .memories{
+    display:flex; flex-direction:column; gap: 54px;
+    max-width: 720px; width:100%; margin: 0 auto;
+  }
+  .memory{
+    display:flex; align-items:center; gap: 34px;
+  }
+  .memory:nth-child(even){ flex-direction: row-reverse; }
+  .memory .frame-wrap{
+    flex-shrink:0; width: 190px;
+  }
+  .polaroid{
+    background: #fffdf9; padding: 12px 12px 30px;
+    box-shadow: 0 14px 26px var(--shadow);
+    width: 100%;
+  }
+  .memory:nth-child(4n+1) .polaroid{ transform: rotate(-4deg); }
+  .memory:nth-child(4n+2) .polaroid{ transform: rotate(3deg); }
+  .memory:nth-child(4n+3) .polaroid{ transform: rotate(-2deg); }
+  .memory:nth-child(4n+4) .polaroid{ transform: rotate(5deg); }
+
+  .polaroid .frame{
+    width:100%; aspect-ratio:1/1;
+    background: linear-gradient(135deg, var(--rose), var(--gold-light));
+    display:flex; align-items:center; justify-content:center;
+    font-size:2.2rem;
+    margin-bottom:10px;
+    position:relative;
+    overflow:hidden;
+  }
+  .polaroid .frame img, .polaroid .frame video{
+    width:100%; height:100%; object-fit:cover;
+  }
+  .polaroid .frame .play-overlay{
+    position:absolute; inset:0;
+    display:flex; align-items:center; justify-content:center;
+    background: rgba(0,0,0,0.15);
+    font-size:1.8rem; color:#fff;
+    pointer-events:none;
+  }
+  .polaroid .label{
+    font-family:'Caveat', cursive; font-size:1rem; text-align:center; color:var(--ink); opacity:0.7;
+  }
+
+  .memory .story{
+    flex:1;
+    font-family:'Cormorant Garamond', serif;
+  }
+  .memory .story .date{
+    font-family:'Caveat', cursive; color:var(--rose-deep); font-size:1.2rem; margin-bottom:6px; display:block;
+  }
+  .memory .story p{
+    font-size:1.15rem; line-height:1.65; color:var(--ink); margin:0;
+  }
+
+  @media (max-width: 640px){
+    .memory, .memory:nth-child(even){
+      flex-direction: column; text-align:center;
+    }
+    .memory .frame-wrap{ width: 220px; }
+  }
+
+  /* --- closing / flowers --- */
+  #closing{
+    overflow:hidden;
+  }
+  .bouquet{ font-size:5rem; margin-bottom: 10px; animation: bloom 3s ease-in-out infinite; }
+  @keyframes bloom{ 0%,100%{ transform:scale(1) rotate(0deg);} 50%{ transform:scale(1.06) rotate(-2deg);} }
+  .closing-text{
+    font-family:'Cinzel', serif; font-size:1.5rem; color:var(--rose-deep);
+    text-align:center; max-width:420px; line-height:1.6; margin-top: 10px;
+  }
+  .closing-sub{ font-family:'Caveat', cursive; font-size:1.3rem; color:var(--ink); opacity:0.75; margin-top:14px; }
+
+  .petal{
+    position:fixed; top:-40px; pointer-events:none; z-index:5;
+    font-size: 1.2rem; opacity:0.85;
+    animation: fall linear forwards;
+  }
+  @keyframes fall{
+    to{ transform: translateY(110vh) rotate(300deg); opacity:0.2; }
+  }
+
+  footer{
+    text-align:center; padding: 26px; font-size:0.8rem; color:var(--ink); opacity:0.5;
+    background: var(--parchment);
+  }
+
+  @media (max-width:480px){
+    .keypad{ grid-template-columns: repeat(3, 56px); gap:12px; }
+    .key{ width:56px; height:56px; }
+    .note-card{ padding: 32px 24px; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ================= INTRO VIDEO ================= -->
+<div id="intro">
+  <video id="introVideo" src="intro.mp4" playsinline></video>
+  <button id="introPlayBtn"><span class="play-icon"></span> Play</button>
+  
+</div>
+
+<!-- ================= LOCK SCREEN ================= -->
+<div id="lock" class="paper">
+  <div class="moon-wrap"><div class="moon"></div></div>
+  <img class="lock-heart" id="lockHeart" alt="" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path d='M50 40 C35 10,5 20,5 45 C5 70,50 95,50 95 C50 95,95 70,95 45 C95 20,65 10,50 40 Z' fill='%23b8546b' stroke='%237a2e3a' stroke-width='3'/><rect x='40' y='38' width='20' height='16' rx='3' fill='%23d9b56a' stroke='%237a2e3a' stroke-width='2'/><circle cx='50' cy='30' r='10' fill='none' stroke='%23d9b56a' stroke-width='4'/></svg>">
+
+  <div class="from-to">From <b id="fromName">Rafed</b> — To <b id="toName">Maryem</b></div>
+
+  <div class="dots" id="dots">
+    <div class="dot" data-i="0"></div>
+    <div class="dot" data-i="1"></div>
+    <div class="dot" data-i="2"></div>
+    <div class="dot" data-i="3"></div>
+  </div>
+
+  <div class="keypad" id="keypad">
+    <button class="key">1</button><button class="key">2</button><button class="key">3</button>
+    <button class="key">4</button><button class="key">5</button><button class="key">6</button>
+    <button class="key">7</button><button class="key">8</button><button class="key">9</button>
+    <button class="key wide" id="clearBtn">Effacer</button><button class="key">0</button><button class="key wide" id="backBtn">⌫</button>
+  </div>
+
+  <div class="lock-hint">entre le code à 4 chiffres pour ouvrir 🔐</div>
+</div>
+
+<!-- ================= MAIN CONTENT ================= -->
+<div id="content">
+
+  <section id="song">
+    <div class="disco"><img src="IMG-20260711-WA0091.jpg" alt=""></div>
+    <audio id="audioPlayer" src="2-PLAYERS-MGHIR-TUNE.mp3"></audio>
+    <div class="track-card">
+      <div class="track-art"><img src="IMG-20260226-WA0007.jpg" alt=""></div>
+      <div class="track-info">
+        <div class="name">23.08</div>
+        <div class="artist">M.R.S</div>
+      </div>
+      <button class="play-btn" id="playBtn">▶</button>
+    </div>
+    <div class="caption">All This For You Sghayra</div>
+  </section>
+
+  <section id="letter">
+    <div class="note-card">
+      <p class="note-text">
+        Happy Birthday PIPITA 🎂❤️<br><br>
+        Today is all about celebrating you and I couldn't let this day pass without telling you how much you mean to me
+
+Every moment we've shared every laugh every conversation and every memory we've made together has become a part of my life that I'll always be grateful for Being with you has made so many ordinary days feel special
+
+Thank you for being yourself for always bringing light into my life and for making me smile even on the hardest days I hope this birthday marks the beginning of a year full of happiness success peace and beautiful surprises
+
+No matter what happens I hope we keep making memories together supporting each other and sharing countless more laughs You're truly one of the best things that has happened to me
+
+Happy Birthday Maryem I hope today is as beautiful as your heart and I wish you nothing but the very best because you deserve it all
+      </p>
+      <span class="note-sign">With Love Mezyena ❤️</span>
+    </div>
+  </section>
+
+  <section id="voice">
+    <audio id="voiceAudio" src="voice.mp3"></audio>
+    <div class="voice-card">
+      <button class="voice-btn" id="voiceBtn">▶</button>
+      <div class="waveform" id="waveform"></div>
+      <div class="voice-time">0:55</div>
+    </div>
+    <div class="caption">Click To Listen Kaaboura</div>
+  </section>
+
+  <section id="locations">
+    <div class="loc-intro">
+      <h2>Our Place</h2>
+      <p>The Place Where It All Began</p>
+    </div>
+
+    <div class="map-card">
+      <div class="map-visual">
+        <div class="map-road h"></div>
+        <div class="map-road v"></div>
+
+        <div class="map-label">Lycée Soliman</div>
+
+        <div class="map-pin">
+          <div class="pin-photo">
+            <img src="IMG-20260217-WA0045~2.jpg" alt="">
+          </div>
+        </div>
+        <div class="map-pulse"></div>
+      </div>
+
+      <div class="map-story">
+        <span class="date">16 September 2025</span>
+        <p>🧑🏻 : Aslema <br>
+        👩🏻 : Aslema <br>
+      🧑🏻 : Ma7lek 3jebtni najem ne5ou instagramek <br>
+    👩🏻 : Ey miselch</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="gallery">
+    <div class="gallery-intro">
+      <h2>Our Memories</h2>
+      <p>Every photo has its story...</p>
+    </div>
+    <div class="memories">
+
+      <div class="memory">
+        <div class="frame-wrap">
+          <div class="polaroid">
+            <div class="frame"><img src="za (2).jpg"></div>
+            <div class="label">💙</div>
+          </div>
+        </div>
+        <div class="story">
+          <span class="date">11 July 2026 / dar dhekra</span>
+          <p>Taswira hedhi lbesna kifkif be zhar malmoumin lkol nahkiw m3a 5altek faouzia kifeh bech na7r9ou ou nadh7kou</p>
+        </div>
+      </div>
+
+      <div class="memory">
+        <div class="frame-wrap">
+          <div class="polaroid">
+            <div class="frame"><video src="VID-20260217-WA0052.mp4" autoplay muted loop playsinline></video></div>
+            <div class="label">🎥</div>
+          </div>
+        </div>
+        <div class="story">
+          <span class="date">16 february 2026 / Payaset</span>
+          <p>nhar hedha awel video na3mlouh m3a b3adhna ou hiya ga3da bjanbi nestanew fi wafe bech tji bech trawa7 </p>
+        </div>
+      </div>
+
+      <div class="memory">
+        <div class="frame-wrap">
+          <div class="polaroid">
+            <div class="frame"><img src="Untitled-1 copy.jpg"></div>
+            <div class="label">📸</div>
+          </div>
+        </div>
+        <div class="story">
+          <span class="date">20 Juin 2026 / Call</span>
+          <p>Hedhi periode resultat hiya twesi fiya ou appel mel appelet li 3ana hata manajmouch nraw b3adhna n7awlou ena man7asouch b3adhna haka</p>
+        </div>
+      </div>
+
+      <div class="memory">
+        <div class="frame-wrap">
+          <div class="polaroid">
+            <div class="frame"><video src="VID-20260623-WA0029.mp4" autoplay muted loop playsinline></video></div>
+            <div class="label">🌊</div>
+          </div>
+        </div>
+        <div class="story">
+          <span class="date">22 Juin 2026 / b7ar</span>
+          <p>Hedhi theni ga3da ou atwel wahda g3adneha 3al b7ar ou ahna merte7in manech n5amou fi chy juste ga3din m3a b3adhna</p>
+        </div>
+      </div>
+
+      <div class="memory">
+        <div class="frame-wrap">
+          <div class="polaroid">
+            <div class="frame"><img src="za (3).jpg"></div>
+            <div class="label">🍝</div>
+          </div>
+        </div>
+        <div class="story">
+          <span class="date">11 July 2026 / dar dhekra</span>
+          <p>Hedhi kifkif fi dar dhekra ama hne fel koujina ntaybou fel ma9rouna kolna ye5i 3malna taswira 3al mreya</p>
+        </div>
+      </div>
+
+      <div class="memory">
+        <div class="frame-wrap">
+          <div class="polaroid">
+            <div class="frame"><img src="IMG-20260315-WA0000.jpg"></div>
+            <div class="label">🌙</div>
+          </div>
+        </div>
+        <div class="story">
+          <span class="date">15 March 2026 / Gate</span>
+          <p>Hedhi awel 5arja m3a b3adhna fi romdhane mchina lgate dh7akna feha ou t3arekna feha</p>
+        </div>
+      </div>
+
+      <div class="memory">
+        <div class="frame-wrap">
+          <div class="polaroid">
+            <div class="frame"><video src="VID-20260703-WA0003.mp4" autoplay muted loop playsinline></video></div>
+            <div class="label">👠</div>
+          </div>
+        </div>
+        <div class="story">
+          <span class="date">3 July 2026 / Bac party </span>
+          <p>Hedhi mraw7in men soireé ou talent dhrabha wena nsawer feha ou hiya theb trawah (rawhet 7afyena fe le5er)</p>
+        </div>
+      </div>
+
+      <div class="memory">
+        <div class="frame-wrap">
+          <div class="polaroid">
+            <div class="frame"><img src="za (5).jpg"></div>
+            <div class="label">🤍</div>
+          </div>
+        </div>
+        <div class="story">
+          <span class="date">11 july 2026 / Bac Party</span>
+          <p>Hedhi fi soireé ranim lbesna kifkif ou chta7na m3a b3adhna ou g3adna m3a b3adhna lila men a7la lyeli li maa baadhna</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <section id="closing">
+    <div class="bouquet">💐</div>
+    <div class="closing-text">❤️ NHEBEK BARCHA ROUHY ❤️</div>
+    <div class="closing-sub">✨ No matter where life takes us, I hope we keep creating beautiful memories together ✨</div>
+  </section>
+
+  <footer>Ⓜ All This Arts Reserved For My Only One MARYOUMETI Ⓜ</footer>
+</div>
+
+<script>
+  // ---------- CONFIG ----------
+  const CODE = "2308"; // <-- change le code secret ici
+
+  // ---------- INTRO VIDEO ----------
+  const intro = document.getElementById("intro");
+  const introVideo = document.getElementById("introVideo");
+  const introSkip = document.getElementById("introSkip");
+  const introPlayBtn = document.getElementById("introPlayBtn");
+
+  function closeIntro(){
+    introVideo.pause();
+    intro.classList.add("hide");
+    setTimeout(()=>{ intro.style.display = "none"; }, 800);
+  }
+  introPlayBtn.addEventListener("click", ()=>{
+    introVideo.play();
+    introPlayBtn.classList.add("hidden");
+  });
+  introVideo.addEventListener("ended", closeIntro);
+  introSkip.addEventListener("click", closeIntro);
+  introVideo.addEventListener("error", closeIntro);
+
+  // ---------- LOCK LOGIC ----------
+  let entered = "";
+  const dots = document.querySelectorAll(".dot");
+  const lock = document.getElementById("lock");
+  const lockHeart = document.getElementById("lockHeart");
+  const content = document.getElementById("content");
+
+  function updateDots(){
+    dots.forEach((d,i)=>{
+      d.classList.toggle("filled", i < entered.length);
+    });
+  }
+
+  function shakeWrong(){
+    dots.forEach(d=>{
+      d.classList.add("shake");
+      setTimeout(()=>d.classList.remove("shake"), 400);
+    });
+  }
+
+  function tryUnlock(){
+    if(entered === CODE){
+      lock.classList.add("unlocked");
+      setTimeout(()=>{
+        lock.style.transition = "opacity .6s ease";
+        lock.style.opacity = "0";
+        setTimeout(()=>{
+          lock.style.display = "none";
+          content.classList.add("show");
+        }, 600);
+      }, 500);
+    } else {
+      shakeWrong();
+      setTimeout(()=>{ entered=""; updateDots(); }, 500);
+    }
+  }
+
+  document.querySelectorAll(".key").forEach(btn=>{
+    if(btn.id === "clearBtn" || btn.id === "backBtn") return;
+    btn.addEventListener("click", ()=>{
+      if(entered.length >= 4) return;
+      entered += btn.textContent.trim();
+      updateDots();
+      if(entered.length === 4) setTimeout(tryUnlock, 150);
+    });
+  });
+  document.getElementById("clearBtn").addEventListener("click", ()=>{ entered=""; updateDots(); });
+  document.getElementById("backBtn").addEventListener("click", ()=>{ entered = entered.slice(0,-1); updateDots(); });
+
+  // ---------- WAVEFORM BARS ----------
+  const waveform = document.getElementById("waveform");
+  for(let i=0;i<28;i++){
+    const bar = document.createElement("span");
+    bar.style.animationDelay = (i*0.05)+"s";
+    waveform.appendChild(bar);
+  }
+
+  // ---------- REAL AUDIO PLAYER (song) ----------
+  const audio = document.getElementById("audioPlayer");
+  const voiceAudio = document.getElementById("voiceAudio");
+  const playBtn = document.getElementById("playBtn");
+
+  playBtn.addEventListener("click", function(){
+    if(audio.paused){
+      audio.play();
+      this.textContent = "❚❚";
+    } else {
+      audio.pause();
+      this.textContent = "▶";
+    }
+  });
+  audio.addEventListener("ended", ()=>{ playBtn.textContent = "▶"; });
+  document.getElementById("voiceBtn").addEventListener("click", function(){
+    if(voiceAudio.paused){
+      audio.volume = 0.12; // el ghneya ten9os
+      voiceAudio.play();
+      this.textContent = "❚❚";
+    } else {
+      voiceAudio.pause();
+      audio.volume = 1; // el ghneya tarja3 l 3adhitha
+      this.textContent = "▶";
+    }
+  });
+  voiceAudio.addEventListener("ended", ()=>{
+    document.getElementById("voiceBtn").textContent = "▶";
+    audio.volume = 1;
+  });
+
+  // ---------- FALLING PETALS on closing section ----------
+  const closing = document.getElementById("closing");
+  const petals = ["🌸","🌷","🌹","💮"];
+  function spawnPetal(){
+    const p = document.createElement("div");
+    p.className = "petal";
+    p.textContent = petals[Math.floor(Math.random()*petals.length)];
+    p.style.left = Math.random()*100 + "vw";
+    p.style.animationDuration = (5 + Math.random()*4) + "s";
+    p.style.fontSize = (0.9 + Math.random()*0.8) + "rem";
+    document.body.appendChild(p);
+    setTimeout(()=>p.remove(), 9000);
+  }
+  let petalInterval;
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        petalInterval = setInterval(spawnPetal, 350);
+      } else {
+        clearInterval(petalInterval);
+      }
+    });
+  }, {threshold:0.4});
+  io.observe(closing);
+</script>
+
+</body>
+</html>
